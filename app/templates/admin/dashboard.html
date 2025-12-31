@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Panel - Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-2 sidebar p-3">
+            {% include 'admin/_sidebar.html' %}
+        </div>
+        
+        <!-- Main Content -->
+        <div class="col-md-10 main-content">
+            <h2 class="mb-4">
+                <i class="bi bi-speedometer2"></i> Admin Dashboard
+            </h2>
+            
+            <!-- İstatistikler -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card stat-card">
+                        <div class="card-body">
+                            <h6 class="text-muted">Toplam Kulüp</h6>
+                            <h2>{{ total_clubs }}</h2>
+                            <small class="text-success">
+                                <i class="bi bi-check-circle"></i> {{ approved_clubs }} Onaylı
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3">
+                    <div class="card stat-card warning">
+                        <div class="card-body">
+                            <h6 class="text-muted">Onay Bekleyen</h6>
+                            <h2>{{ pending_clubs }}</h2>
+                            <a href="{{ url_for('admin.pending_clubs') }}" class="btn btn-sm btn-warning">
+                                <i class="bi bi-eye"></i> Görüntüle
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3">
+                    <div class="card stat-card success">
+                        <div class="card-body">
+                            <h6 class="text-muted">Toplam Paylaşım</h6>
+                            <h2>{{ total_posts }}</h2>
+                            <a href="{{ url_for('admin.all_posts') }}" class="btn btn-sm btn-success">
+                                <i class="bi bi-eye"></i> Görüntüle
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3">
+                    <div class="card stat-card danger">
+                        <div class="card-body">
+                            <h6 class="text-muted">Hızlı İşlem</h6>
+                            <a href="{{ url_for('admin.create_post') }}" class="btn btn-primary mt-2">
+                                <i class="bi bi-plus-circle"></i> Yeni Paylaşım
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <!-- Son Paylaşımlar -->
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="bi bi-card-text"></i> Son Paylaşımlar
+                        </div>
+                        <div class="card-body">
+                            {% if recent_posts %}
+                                <div class="list-group list-group-flush">
+                                    {% for post in recent_posts %}
+                                        <div class="list-group-item">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div>
+                                                    <h6 class="mb-1">{{ post.title }}</h6>
+                                                    <small class="text-muted">
+                                                        {{ post.get_author_name() }} - 
+                                                        {{ post.created_at.strftime('%d.%m.%Y %H:%M') }}
+                                                    </small>
+                                                </div>
+                                                <a href="{{ url_for('admin.edit_post', id=post.id) }}" 
+                                                   class="btn btn-sm btn-outline-primary">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                <div class="text-center mt-3">
+                                    <a href="{{ url_for('admin.all_posts') }}" class="btn btn-outline-primary">
+                                        Tümünü Gör <i class="bi bi-arrow-right"></i>
+                                    </a>
+                                </div>
+                            {% else %}
+                                <p class="text-muted text-center">Henüz paylaşım yok.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Son Kulüp Başvuruları -->
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="bi bi-clock-history"></i> Son Kulüp Başvuruları
+                        </div>
+                        <div class="card-body">
+                            {% if recent_applications %}
+                                <div class="list-group list-group-flush">
+                                    {% for application in recent_applications %}
+                                        <div class="list-group-item">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <h6 class="mb-1">{{ application.club.name }}</h6>
+                                                    <small class="text-muted">
+                                                        {{ application.created_at.strftime('%d.%m.%Y %H:%M') }}
+                                                    </small>
+                                                </div>
+                                                <form method="POST" action="{{ url_for('admin.approve_club', id=application.id) }}" 
+                                                      style="display: inline;">
+                                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                    <button type="submit" class="btn btn-sm btn-success">
+                                                        <i class="bi bi-check-circle"></i> Onayla
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                <div class="text-center mt-3">
+                                    <a href="{{ url_for('admin.pending_clubs') }}" class="btn btn-outline-warning">
+                                        Tümünü Gör <i class="bi bi-arrow-right"></i>
+                                    </a>
+                                </div>
+                            {% else %}
+                                <p class="text-muted text-center">Onay bekleyen kulüp yok.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

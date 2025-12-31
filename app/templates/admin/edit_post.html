@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}Paylaşımı Düzenle - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-2 sidebar p-3">
+            {% include 'admin/_sidebar.html' %}
+        </div>
+        
+        <!-- Main Content -->
+        <div class="col-md-10 main-content">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>
+                    <i class="bi bi-pencil"></i> Paylaşımı Düzenle
+                </h2>
+                <a href="{{ url_for('admin.all_posts') }}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Geri
+                </a>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="bi bi-pencil"></i> Paylaşım Bilgileri
+                        </div>
+                        <div class="card-body">
+                            <form method="POST" enctype="multipart/form-data">
+                                {{ form.hidden_tag() }}
+                                
+                                <!-- Başlık -->
+                                <div class="mb-3">
+                                    {{ form.title.label(class="form-label") }}
+                                    {{ form.title(class="form-control" + (" is-invalid" if form.title.errors else "")) }}
+                                    {% if form.title.errors %}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.title.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- İçerik -->
+                                <div class="mb-3">
+                                    {{ form.content.label(class="form-label") }}
+                                    {{ form.content(class="form-control" + (" is-invalid" if form.content.errors else ""), rows="10") }}
+                                    {% if form.content.errors %}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.content.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Mevcut Görsel -->
+                                {% set current_images = post.get_images() %}
+                                {% if current_images %}
+                                    <div class="mb-3">
+                                        <label class="form-label">Mevcut Görseller</label>
+                                        <div class="d-flex flex-wrap gap-2">
+                                            {% for img in current_images %}
+                                                <img src="{{ url_for('static', filename='uploads/' + img) }}" 
+                                                     class="img-fluid rounded" 
+                                                     style="height: 100px; width: 100px; object-fit: cover;"
+                                                     alt="{{ post.title }}">
+                                            {% endfor %}
+                                        </div>
+                                        <small class="text-muted">Yeni görseller yüklerseniz mevcutların sonuna eklenecektir.</small>
+                                    </div>
+                                {% endif %}
+                                
+                                <!-- Yeni Görsel -->
+                                <div class="mb-3">
+                                    {{ form.images.label(class="form-label") }}
+                                    {{ form.images(class="form-control" + (" is-invalid" if form.images.errors else "")) }}
+                                    {% if form.images.errors %}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.images.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    <small class="text-muted">
+                                        Çoklu seçim yapabilirsiniz. Maksimum dosya boyutu: 16MB (jpg, jpeg, png, gif, webp)
+                                    </small>
+                                </div>
+                                
+                                <!-- Butonlar -->
+                                <div class="d-grid gap-2">
+                                    {{ form.submit(class="btn btn-primary btn-lg") }}
+                                    <a href="{{ url_for('admin.all_posts') }}" class="btn btn-outline-secondary">
+                                        İptal
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Paylaşım Bilgileri -->
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="bi bi-info-circle"></i> Paylaşım Bilgileri
+                        </div>
+                        <div class="card-body">
+                            <p>
+                                <strong>Yazar:</strong><br>
+                                <span class="badge bg-secondary">{{ post.get_author_name() }}</span>
+                            </p>
+                            
+                            <p>
+                                <strong>Oluşturulma:</strong><br>
+                                {{ post.created_at.strftime('%d.%m.%Y %H:%M') }}
+                            </p>
+                            
+                            {% if post.updated_at != post.created_at %}
+                                <p>
+                                    <strong>Son Güncelleme:</strong><br>
+                                    {{ post.updated_at.strftime('%d.%m.%Y %H:%M') }}
+                                </p>
+                            {% endif %}
+                            
+                            <hr>
+                            
+                            <div class="d-grid gap-2">
+                                <form method="POST" action="{{ url_for('admin.delete_post', id=post.id) }}" 
+                                      onsubmit="return confirm('Bu paylaşımı silmek istediğinizden emin misiniz?')">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-danger w-100">
+                                        <i class="bi bi-trash"></i> Paylaşımı Sil
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

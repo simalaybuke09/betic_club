@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Mesajlar - Kulüp Paneli{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-2 sidebar p-3">
+            {% include 'club/_sidebar.html' %}
+        </div>
+        <div class="col-md-10 main-content">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="bi bi-chat-dots"></i> Mesajlar</h2>
+                <a href="{{ url_for('club.send_message') }}" class="btn btn-primary">
+                    <i class="bi bi-pencil-square"></i> Yeni Mesaj Yaz
+                </a>
+            </div>
+            
+            {% if chats %}
+                <div class="list-group">
+                    {% for chat in chats %}
+                        <a href="{{ url_for('club.chat', slug=chat.club.slug) }}" class="list-group-item list-group-item-action p-3 mb-2 border rounded shadow-sm">
+                            <div class="d-flex align-items-center">
+                                {% if chat.club.logo %}
+                                    <img src="{{ url_for('static', filename='uploads/' + chat.club.logo) }}" 
+                                         style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;" class="me-3">
+                                {% else %}
+                                    <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                                        <i class="bi bi-people text-white"></i>
+                                    </div>
+                                {% endif %}
+                                
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-1 text-primary">{{ chat.club.name }}</h5>
+                                        <small class="text-muted">{{ chat.last_msg.created_at.strftime('%d.%m %H:%M') }}</small>
+                                    </div>
+                                    <p class="mb-1 text-muted text-truncate" style="max-width: 600px;">
+                                        {% if chat.last_msg.sender_id == current_user.id %}
+                                            <i class="bi bi-check2"></i> Siz: 
+                                        {% endif %}
+                                        {{ chat.last_msg.content }}
+                                    </p>
+                                </div>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info text-center p-5">
+                    <i class="bi bi-inbox display-4"></i>
+                    <p class="mt-3">Henüz hiç mesajınız yok.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

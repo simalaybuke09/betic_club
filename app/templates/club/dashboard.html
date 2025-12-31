@@ -1,0 +1,308 @@
+{% extends "base.html" %}
+
+{% block title %}{{ club.name }} - Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-2 sidebar p-3">
+            {% include 'club/_sidebar.html' %}
+        </div>
+        
+        <!-- Main Content -->
+        <div class="col-md-10 main-content">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="fw-bold">
+                        <i class="bi bi-speedometer2"></i> Hoş Geldiniz, {{ club.name }}
+                    </h2>
+                    <p class="text-muted mb-0">Kulüp yönetim paneliniz</p>
+                </div>
+                <a href="{{ url_for('club.create_post') }}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Yeni Paylaşım
+                </a>
+            </div>
+            
+            <!-- İstatistikler -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="card stat-card">
+                        <div class="card-body">
+                            <h6 class="text-muted text-uppercase small fw-bold">Toplam Paylaşım</h6>
+                            <h2 class="display-6 fw-bold mb-3">{{ total_posts }}</h2>
+                            <a href="#posts-section" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-eye"></i> Görüntüle
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card stat-card success">
+                        <div class="card-body">
+                            <h6 class="text-muted text-uppercase small fw-bold">Üye Sayısı</h6>
+                            <h2 class="display-6 fw-bold mb-3">{{ club.member_count or 0 }}</h2>
+                            <a href="{{ url_for('club.edit_profile') }}" class="btn btn-sm btn-outline-success">
+                                <i class="bi bi-pencil"></i> Güncelle
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card stat-card warning">
+                        <div class="card-body">
+                            <h6 class="text-muted text-uppercase small fw-bold">Geri Bildirimler</h6>
+                            <h2 class="display-6 fw-bold mb-3">{{ feedback_count }}</h2>
+                            {% if feedback_count > 0 %}
+                                <a href="#feedbacks-section" class="btn btn-sm btn-outline-warning">
+                                    <i class="bi bi-eye"></i> Görüntüle
+                                </a>
+                            {% else %}
+                                <small class="text-muted">Henüz geri bildirim yok</small>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Geri Bildirimler -->
+            {% if feedbacks %}
+                <div id="feedbacks-section" class="mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4>
+                            <i class="bi bi-chat-dots"></i> Yönetimden Gelen Geri Bildirimler
+                        </h4>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-body">
+                            {% for feedback in feedbacks %}
+                                <div class="alert alert-info mb-3">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div class="flex-grow-1">
+                                            <h5 class="alert-heading">
+                                                <i class="bi bi-envelope"></i> {{ feedback.title }}
+                                            </h5>
+                                            <p class="mb-2" style="white-space: pre-wrap;">{{ feedback.content }}</p>
+                                            <small class="text-muted">
+                                                <i class="bi bi-clock"></i> {{ feedback.created_at.strftime('%d.%m.%Y %H:%M') }}
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                            
+                            {% if feedback_count > 5 %}
+                                <div class="text-center">
+                                    <small class="text-muted">
+                                        Toplam {{ feedback_count }} geri bildirim var. Son 5 tanesi gösteriliyor.
+                                    </small>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            
+            <!-- Hızlı İşlemler -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="bi bi-lightning-fill"></i> Hızlı İşlemler
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <a href="{{ url_for('club.create_post') }}" class="btn btn-outline-primary w-100 mb-2">
+                                        <i class="bi bi-plus-circle"></i><br>Yeni Paylaşım
+                                    </a>
+                                </div>
+                                <div class="col-md-3">
+                                    <a href="{{ url_for('club.edit_profile') }}" class="btn btn-outline-success w-100 mb-2">
+                                        <i class="bi bi-pencil"></i><br>Profili Düzenle
+                                    </a>
+                                </div>
+                                <div class="col-md-3">
+                                    <a href="{{ url_for('main.club_profile', slug=club.slug) }}" class="btn btn-outline-secondary w-100 mb-2">
+                                        <i class="bi bi-eye"></i><br>Profili Görüntüle
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Paylaşımlar -->
+            <div id="posts-section">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4>
+                        <i class="bi bi-card-text"></i> Paylaşımlarım
+                    </h4>
+                </div>
+                
+                {% if posts %}
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Görsel</th>
+                                            <th>Başlık</th>
+                                            <th>Tarih</th>
+                                            <th>İşlemler</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for post in posts %}
+                                            <tr>
+                                                <td>
+                                                    {% if post.get_images() %}
+                                                        <img src="{{ url_for('static', filename='uploads/' + post.get_images()[0]) }}" 
+                                                             class="post-image" 
+                                                             style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;"
+                                                             alt="{{ post.title }}">
+                                                    {% else %}
+                                                        <div class="bg-secondary d-flex align-items-center justify-content-center" 
+                                                             style="width: 80px; height: 80px; border-radius: 8px;">
+                                                            <i class="bi bi-card-image text-white"></i>
+                                                        </div>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    <strong>{{ post.title }}</strong>
+                                                    <br>
+                                                    <small class="text-muted">
+                                                        {{ post.get_excerpt(80) }}
+                                                    </small>
+                                                </td>
+                                                <td>
+                                                    <small>{{ post.created_at.strftime('%d.%m.%Y') }}</small>
+                                                    <br>
+                                                    <small class="text-muted">{{ post.created_at.strftime('%H:%M') }}</small>
+                                                </td>
+                                                <td>
+                                                    <div class="btn-group-vertical" role="group">
+                                                        <button type="button" class="btn btn-sm btn-info" 
+                                                                data-bs-toggle="modal" 
+                                                                data-bs-target="#viewModal{{ post.id }}">
+                                                            <i class="bi bi-eye"></i> Görüntüle
+                                                        </button>
+                                                        {% set share_url = url_for('main.club_profile', slug=club.slug, _external=True) ~ '#post-' ~ post.id %}
+                                                        <button type="button" class="btn btn-sm btn-secondary" 
+                                                                onclick="copyToClipboard('{{ share_url }}', this)">
+                                                            <i class="bi bi-link-45deg"></i> Link
+                                                        </button>
+                                                        <a href="{{ url_for('club.edit_post', id=post.id) }}" 
+                                                           class="btn btn-sm btn-primary">
+                                                            <i class="bi bi-pencil"></i> Düzenle
+                                                        </a>
+                                                        <form method="POST" action="{{ url_for('club.delete_post', id=post.id) }}">
+                                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                            <button type="submit" class="btn btn-sm btn-danger w-100" 
+                                                                    onclick="return confirm('Bu paylaşımı silmek istediğinizden emin misiniz?')">
+                                                                <i class="bi bi-trash"></i> Sil
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            
+                                            <!-- Görüntüle Modal -->
+                                            <div class="modal fade" id="viewModal{{ post.id }}" tabindex="-1">
+                                                <div class="modal-dialog modal-lg">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">{{ post.title }}</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            {% if post.get_images() %}
+                                                                <div class="post-images-gallery mb-3">
+                                                                    <div class="d-flex overflow-auto" style="gap: 10px; scroll-snap-type: x mandatory;">
+                                                                        {% for img in post.get_images() %}
+                                                                            <img src="{{ url_for('static', filename='uploads/' + img) }}" 
+                                                                                 class="img-fluid rounded post-image-gallery" 
+                                                                                 alt="{{ post.title }}"
+                                                                             style="min-width: 300px; height: 300px; object-fit: cover; scroll-snap-align: start;">
+                                                                        {% endfor %}
+                                                                    </div>
+                                                                </div>
+                                                            {% endif %}
+                                                            
+                                                            <div class="mb-3">
+                                                                <strong>Tarih:</strong> 
+                                                                {{ post.created_at.strftime('%d.%m.%Y %H:%M') }}
+                                                            </div>
+                                                            
+                                                            <hr>
+                                                            
+                                                            <div style="white-space: pre-wrap;">{{ post.content }}</div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <a href="{{ url_for('club.edit_post', id=post.id) }}" 
+                                                               class="btn btn-primary">
+                                                                <i class="bi bi-pencil"></i> Düzenle
+                                                            </a>
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    {% if pagination.pages > 1 %}
+                        <nav class="mt-3">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+                                    <a class="page-link" href="{{ url_for('club.dashboard', page=pagination.prev_num) if pagination.has_prev else '#' }}">
+                                        <i class="bi bi-chevron-left"></i>
+                                    </a>
+                                </li>
+                                
+                                {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                                    {% if page_num %}
+                                        <li class="page-item {% if page_num == pagination.page %}active{% endif %}">
+                                            <a class="page-link" href="{{ url_for('club.dashboard', page=page_num) }}">
+                                                {{ page_num }}
+                                            </a>
+                                        </li>
+                                    {% else %}
+                                        <li class="page-item disabled">
+                                            <span class="page-link">...</span>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                                
+                                <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+                                    <a class="page-link" href="{{ url_for('club.dashboard', page=pagination.next_num) if pagination.has_next else '#' }}">
+                                        <i class="bi bi-chevron-right"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    {% endif %}
+                {% else %}
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> Henüz paylaşım yapmadınız. 
+                        <a href="{{ url_for('club.create_post') }}" class="alert-link">İlk paylaşımınızı oluşturun!</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% endblock %}

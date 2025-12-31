@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}Paylaşımları Yönet - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-2 sidebar p-3">
+            {% include 'admin/_sidebar.html' %}
+        </div>
+        
+        <!-- Main Content -->
+        <div class="col-md-10 main-content">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>
+                    <i class="bi bi-card-text"></i> Tüm Paylaşımlar
+                </h2>
+                <a href="{{ url_for('admin.create_post') }}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Yeni Paylaşım
+                </a>
+            </div>
+            
+            {% if posts %}
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Görsel</th>
+                                        <th>Başlık</th>
+                                        <th>Yazar</th>
+                                        <th>Tarih</th>
+                                        <th>İşlemler</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for post in posts %}
+                                        <tr>
+                                            <td>
+                                                {% if post.get_images() %}
+                                                    <img src="{{ url_for('static', filename='uploads/' + post.get_images()[0]) }}" 
+                                                         class="post-image" alt="{{ post.title }}">
+                                                {% else %}
+                                                    <div class="post-image bg-secondary d-flex align-items-center justify-content-center">
+                                                        <i class="bi bi-card-image text-white"></i>
+                                                    </div>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <strong>{{ post.title }}</strong>
+                                                <br>
+                                                <small class="text-muted">
+                                                    {{ post.get_excerpt(100) }}
+                                                </small>
+                                            </td>
+                                            <td>
+                                                {% if post.is_by_admin() %}
+                                                    <span class="badge bg-danger">
+                                                        <i class="bi bi-shield-check"></i> Admin
+                                                    </span>
+                                                {% else %}
+                                                    <div class="d-flex align-items-center">
+                                                        {% if post.get_author_logo() %}
+                                                            <img src="{{ url_for('static', filename='uploads/' + post.get_author_logo()) }}" 
+                                                                 style="width: 30px; height: 30px; border-radius: 50%;" 
+                                                                 class="me-2">
+                                                        {% endif %}
+                                                        <span>{{ post.get_author_name() }}</span>
+                                                    </div>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <small>{{ post.created_at.strftime('%d.%m.%Y') }}</small>
+                                                <br>
+                                                <small class="text-muted">{{ post.created_at.strftime('%H:%M') }}</small>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group-vertical" role="group">
+                                                    <button type="button" class="btn btn-sm btn-info" 
+                                                            data-bs-toggle="modal" 
+                                                            data-bs-target="#viewModal{{ post.id }}">
+                                                        <i class="bi bi-eye"></i> Görüntüle
+                                                    </button>
+                                                    
+                                                    <a href="{{ url_for('admin.edit_post', id=post.id) }}" 
+                                                       class="btn btn-sm btn-primary">
+                                                        <i class="bi bi-pencil"></i> Düzenle
+                                                    </a>
+                                                    
+                                                    <form method="POST" action="{{ url_for('admin.delete_post', id=post.id) }}">
+                                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                        <button type="submit" class="btn btn-sm btn-danger w-100" 
+                                                                onclick="return confirm('Bu paylaşımı silmek istediğinizden emin misiniz?')">
+                                                            <i class="bi bi-trash"></i> Sil
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        
+                                        <!-- Görüntüle Modal -->
+                                        <div class="modal fade" id="viewModal{{ post.id }}" tabindex="-1">
+                                            <div class="modal-dialog modal-lg">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">{{ post.title }}</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        {% if post.get_images() %}
+                                                            <div class="post-images-gallery mb-3">
+                                                                <div class="d-flex overflow-auto" style="gap: 10px; scroll-snap-type: x mandatory;">
+                                                                    {% for img in post.get_images() %}
+                                                                        <img src="{{ url_for('static', filename='uploads/' + img) }}" 
+                                                                             class="img-fluid rounded post-image-gallery" 
+                                                                             alt="{{ post.title }}"
+                                                                         style="min-width: 300px; height: 300px; object-fit: cover; scroll-snap-align: start;">
+                                                                    {% endfor %}
+                                                                </div>
+                                                            </div>
+                                                        {% endif %}
+                                                        
+                                                        <div class="mb-3">
+                                                            <strong>Yazar:</strong> 
+                                                            <span class="badge bg-secondary">{{ post.get_author_name() }}</span>
+                                                        </div>
+                                                        
+                                                        <div class="mb-3">
+                                                            <strong>Tarih:</strong> 
+                                                            {{ post.created_at.strftime('%d.%m.%Y %H:%M') }}
+                                                        </div>
+                                                        
+                                                        <hr>
+                                                        
+                                                        <div style="white-space: pre-wrap;">{{ post.content }}</div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <a href="{{ url_for('admin.edit_post', id=post.id) }}" 
+                                                           class="btn btn-primary">
+                                                            <i class="bi bi-pencil"></i> Düzenle
+                                                        </a>
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pagination -->
+                {% if pagination.pages > 1 %}
+                    <nav>
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+                                <a class="page-link" href="{{ url_for('admin.all_posts', page=pagination.prev_num) if pagination.has_prev else '#' }}">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                            </li>
+                            
+                            {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                                {% if page_num %}
+                                    <li class="page-item {% if page_num == pagination.page %}active{% endif %}">
+                                        <a class="page-link" href="{{ url_for('admin.all_posts', page=page_num) }}">
+                                            {{ page_num }}
+                                        </a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item disabled">
+                                        <span class="page-link">...</span>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+                                <a class="page-link" href="{{ url_for('admin.all_posts', page=pagination.next_num) if pagination.has_next else '#' }}">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                {% endif %}
+            {% else %}
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> Henüz paylaşım bulunmamaktadır.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

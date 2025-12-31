@@ -1,0 +1,27 @@
+<nav class="nav flex-column">
+    <a class="nav-link {{ 'active' if request.endpoint == 'admin.dashboard' }}" href="{{ url_for('admin.dashboard') }}">
+        <i class="bi bi-speedometer2"></i> Dashboard
+    </a>
+    <a class="nav-link {{ 'active' if request.endpoint == 'admin.pending_clubs' }}" href="{{ url_for('admin.pending_clubs') }}">
+        <i class="bi bi-clock-history"></i> Onay Bekleyenler
+    </a>
+    <a class="nav-link {{ 'active' if request.endpoint == 'admin.all_clubs' }}" href="{{ url_for('admin.all_clubs') }}">
+        <i class="bi bi-people"></i> Tüm Kulüpler
+    </a>
+    <a class="nav-link {{ 'active' if request.endpoint == 'admin.all_posts' }}" href="{{ url_for('admin.all_posts') }}">
+        <i class="bi bi-card-text"></i> Paylaşımlar
+    </a>
+    <a class="nav-link {{ 'active' if request.endpoint == 'admin.create_post' }}" href="{{ url_for('admin.create_post') }}">
+        <i class="bi bi-plus-circle"></i> Yeni Paylaşım
+    </a>
+    <a class="nav-link {{ 'active' if request.endpoint == 'admin.send_feedback' }}" href="{{ url_for('admin.send_feedback') }}">
+        <i class="bi bi-chat-dots"></i> Geri Bildirim Gönder
+    </a>
+    <a class="nav-link {{ 'active' if request.endpoint == 'admin.all_feedbacks' }}" href="{{ url_for('admin.all_feedbacks') }}">
+        <i class="bi bi-envelope"></i> Tüm Geri Bildirimler
+    </a>
+    <hr>
+    <a class="nav-link" href="{{ url_for('main.home') }}">
+        <i class="bi bi-house"></i> Ana Sayfaya Dön
+    </a>
+</nav>

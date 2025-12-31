@@ -1,0 +1,18 @@
+/* app/static/css/custom.css */
+
+/* Dark Mode */
+.dark-mode {
+    background: #1a1a1a;
+    color: #fff;
+}
+
+/* Animasyonlar */
+.card:hover {
+    transform: translateY(-5px);
+    transition: 0.3s;
+}
+
+/* Gradient Butonlar */
+.btn-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}

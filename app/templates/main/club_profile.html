@@ -1,0 +1,363 @@
+{% extends "base.html" %}
+
+{% block title %}{{ club.name }} - Kulüp Profili{% endblock %}
+
+{% block extra_css %}
+<style>
+    .profile-header {
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        color: white;
+        padding: 80px 0 60px;
+        margin-bottom: 40px;
+        border-radius: 0 0 30px 30px;
+    }
+    
+    .club-logo-large {
+        width: 150px;
+        height: 150px;
+        border-radius: 20px;
+        object-fit: cover;
+        border: 5px solid white;
+        box-shadow: 0 4px 12px rgba(0,0,0,.15);
+        background: white;
+    }
+    
+    .info-card {
+        border: none;
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+        margin-bottom: 30px;
+        transition: transform 0.2s;
+    }
+    
+    .info-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .info-card .card-header {
+        background: white;
+        border-bottom: 2px solid #f8f9fa;
+        font-weight: 600;
+        padding: 20px;
+        border-radius: 16px 16px 0 0 !important;
+    }
+    
+    .social-link {
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        line-height: 40px;
+        text-align: center;
+        border-radius: 50%;
+        margin-right: 8px;
+        transition: transform 0.2s;
+        text-decoration: none;
+        color: white;
+    }
+    
+    .social-link:hover {
+        transform: scale(1.1);
+        color: white;
+    }
+    
+    .post-card {
+        border: none;
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+        margin-bottom: 30px;
+        transition: transform 0.2s;
+    }
+    
+    .post-card:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .post-image {
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+        border-radius: 12px;
+    }
+    
+    .stat-box {
+        text-align: center;
+        padding: 20px;
+    }
+    
+    .stat-box h3 {
+        font-size: 2rem;
+        color: #4f46e5;
+        margin-bottom: 5px;
+        font-weight: 700;
+    }
+    
+    .stat-box p {
+        color: #999;
+        margin: 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Profile Header -->
+<div class="profile-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-auto text-center text-md-start mb-3 mb-md-0">
+                {% if club.logo %}
+                    <img src="{{ url_for('static', filename='uploads/' + club.logo) }}" 
+                         class="club-logo-large" 
+                         alt="{{ club.name }}">
+                {% else %}
+                    <div class="club-logo-large d-flex align-items-center justify-content-center">
+                        <i class="bi bi-people" style="font-size: 4rem; color: #4f46e5;"></i>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="col-md">
+                <h1 class="display-5 mb-2">{{ club.name }}</h1>
+                <p class="lead mb-3">
+                    <i class="bi bi-geo-alt"></i> {{ club.location }}
+                </p>
+                
+                <!-- Sosyal Medya -->
+                {% if club.has_social_media() %}
+                    <div>
+                        {% if club.instagram %}
+                            <a href="https://instagram.com/{{ club.instagram }}" 
+                               class="social-link" 
+                               style="background: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%);"
+                               target="_blank">
+                                <i class="bi bi-instagram"></i>
+                            </a>
+                        {% endif %}
+                        
+                        {% if club.twitter %}
+                            <a href="https://twitter.com/{{ club.twitter }}" 
+                               class="social-link bg-info" 
+                               target="_blank">
+                                <i class="bi bi-twitter"></i>
+                            </a>
+                        {% endif %}
+                        
+                        {% if club.linkedin %}
+                            <a href="https://linkedin.com/{{ club.linkedin }}" 
+                               class="social-link bg-primary" 
+                               target="_blank">
+                                <i class="bi bi-linkedin"></i>
+                            </a>
+                        {% endif %}
+                        
+                        {% if club.facebook %}
+                            <a href="https://facebook.com/{{ club.facebook }}" 
+                               class="social-link" 
+                               style="background: #1877f2;"
+                               target="_blank">
+                                <i class="bi bi-facebook"></i>
+                            </a>
+                        {% endif %}
+                        
+                        {% if club.website %}
+                            <a href="{{ club.website }}" 
+                               class="social-link bg-dark" 
+                               target="_blank">
+                                <i class="bi bi-globe"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="col-md-auto">
+                <a href="{{ url_for('main.home') }}" class="btn btn-light">
+                    <i class="bi bi-arrow-left"></i> Ana Sayfa
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div class="row">
+        <!-- Sol Kolon - Bilgiler -->
+        <div class="col-lg-4">
+            <!-- İstatistikler -->
+            <div class="info-card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="stat-box">
+                                <h3>{{ club.member_count or 0 }}</h3>
+                                <p><i class="bi bi-people"></i> Üye</p>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-box">
+                                <h3>{{ posts|length }}</h3>
+                                <p><i class="bi bi-card-text"></i> Paylaşım</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Hakkımızda -->
+            <div class="info-card">
+                <div class="card-header">
+                    <i class="bi bi-info-circle"></i> Hakkımızda
+                </div>
+                <div class="card-body">
+                    <p style="white-space: pre-wrap;">{{ club.about or 'Henüz bilgi eklenmemiş.' }}</p>
+                </div>
+            </div>
+            
+            <!-- Başarılarımız -->
+            {% if club.achievements %}
+                <div class="info-card">
+                    <div class="card-header">
+                        <i class="bi bi-trophy"></i> Başarılarımız
+                    </div>
+                    <div class="card-body">
+                        <p style="white-space: pre-wrap;">{{ club.achievements }}</p>
+                    </div>
+                </div>
+            {% endif %}
+            
+            <!-- İletişim -->
+            <div class="info-card">
+                <div class="card-header">
+                    <i class="bi bi-telephone"></i> İletişim
+                </div>
+                <div class="card-body">
+                    {% if club.phone %}
+                        <p class="mb-2">
+                            <i class="bi bi-phone"></i> 
+                            <a href="tel:{{ club.phone }}" class="text-decoration-none">{{ club.phone }}</a>
+                        </p>
+                    {% endif %}
+                    
+                    {% if club.email_contact %}
+                        <p class="mb-2">
+                            <i class="bi bi-envelope"></i> 
+                            <a href="mailto:{{ club.email_contact }}" class="text-decoration-none">{{ club.email_contact }}</a>
+                        </p>
+                    {% endif %}
+                    
+                    <p class="mb-0">
+                        <i class="bi bi-geo-alt"></i> {{ club.location }}
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sağ Kolon - Yönetim Kurulu ve Paylaşımlar -->
+        <div class="col-lg-8">
+            <!-- Paylaşımlar -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4>
+                    <i class="bi bi-card-text"></i> Paylaşımlar
+                </h4>
+            </div>
+            
+            {% if posts %}
+                {% for post in posts %}
+                    <div class="card post-card">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ post.title }}</h5>
+                            <p class="text-muted small mb-3">
+                                <i class="bi bi-clock"></i> {{ post.created_at.strftime('%d.%m.%Y %H:%M') }}
+                            </p>
+                            
+                            {% if post.get_images() %}
+                                <div class="post-images-gallery mb-3">
+                                    <div class="d-flex overflow-auto" style="gap: 10px; scroll-snap-type: x mandatory;">
+                                        {% for img in post.get_images() %}
+                                            {% set img_url = url_for('static', filename='uploads/' + img) %}
+                                            <img src="{{ img_url }}" 
+                                                 class="post-image-gallery" 
+                                                 alt="{{ post.title }}"
+                                                 style="min-width: 300px; height: 300px; object-fit: cover; border-radius: 12px; scroll-snap-align: start; cursor: pointer;"
+                                                 onclick="openImageModal('{{ img_url }}')">
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                            
+                            <p class="card-text" style="white-space: pre-wrap;">{{ post.content }}</p>
+                            
+                            <!-- Sosyal Medya Paylaşım -->
+                            <div class="share-buttons mt-3 pt-3 border-top">
+                                {% set post_url = url_for('main.club_profile', slug=club.slug, _external=True) ~ '#post-' ~ post.id %}
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="https://twitter.com/intent/tweet?text={{ post.title|urlencode }}&url={{ post_url|urlencode }}" 
+                                       target="_blank" 
+                                       class="btn btn-info">
+                                        <i class="bi bi-twitter"></i> Twitter
+                                    </a>
+                                    <a href="https://www.facebook.com/sharer/sharer.php?u={{ post_url|urlencode }}" 
+                                       target="_blank" 
+                                       class="btn btn-primary">
+                                        <i class="bi bi-facebook"></i> Facebook
+                                    </a>
+                                    <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ post_url|urlencode }}" 
+                                       target="_blank" 
+                                       class="btn btn-secondary">
+                                        <i class="bi bi-linkedin"></i> LinkedIn
+                                    </a>
+                                    <button onclick="copyToClipboard('{{ post_url }}', this)" 
+                                            class="btn btn-secondary">
+                                        <i class="bi bi-link-45deg"></i> Link Kopyala
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+                
+                <!-- Pagination -->
+                {% if pagination.pages > 1 %}
+                    <nav>
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+                                <a class="page-link" href="{{ url_for('main.club_profile', slug=club.slug, page=pagination.prev_num) if pagination.has_prev else '#' }}">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                            </li>
+                            
+                            {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                                {% if page_num %}
+                                    <li class="page-item {% if page_num == pagination.page %}active{% endif %}">
+                                        <a class="page-link" href="{{ url_for('main.club_profile', slug=club.slug, page=page_num) }}">
+                                            {{ page_num }}
+                                        </a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item disabled">
+                                        <span class="page-link">...</span>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+                                <a class="page-link" href="{{ url_for('main.club_profile', slug=club.slug, page=pagination.next_num) if pagination.has_next else '#' }}">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                {% endif %}
+            {% else %}
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> Henüz paylaşım yapılmamış.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% endblock %}

@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Sohbet: {{ target_club.name }} - Kulüp Paneli{% endblock %}
+
+{% block extra_css %}
+<style>
+   /* Mesaj satırı: Her mesaj bir satır kaplar */
+   .message-row {
+    display: flex;
+    margin-bottom: 1rem;
+    width: 100%;
+   }
+
+   /* Bizim mesajımız: Sağa yasla */
+   .message-row.me {
+    justify-content: flex-end;
+   }
+
+   /* Karşı tarafın mesajı: Sola yasla */
+   .message-row.other {
+    justify-content: flex-start;
+   }
+
+   /* Mesaj balonu genel stil */
+   .message-bubble {
+    max-width: 70%;
+    padding: 1rem;
+    border-radius: 15px;
+    position: relative;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    color: white;
+   }
+
+   /* Bizim balonumuz: Yeşil ve sağ alt köşe sivri */
+   .message-row.me .message-bubble {
+    background-color: #198754;
+    border-bottom-right-radius: 0;
+   }
+
+   /* Karşı tarafın balonu: Mavi ve sol alt köşe sivri */
+   .message-row.other .message-bubble {
+    background-color: #0d6efd;
+    border-bottom-left-radius: 0;
+   }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-2 sidebar p-3">
+            {% include 'club/_sidebar.html' %}
+        </div>
+  <div class="col-md-10 main-content">
+            <!-- Başlık -->
+            <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+                <div class="d-flex align-items-center">
+                    <a href="{{ url_for('club.messages') }}" class="btn btn-outline-secondary me-3">
+                        <i class="bi bi-arrow-left"></i>
+                    </a>
+                    {% if target_club.logo %}
+                        <img src="{{ url_for('static', filename='uploads/' + target_club.logo) }}" 
+                             style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;" class="me-2">
+                    {% endif %}
+                    <h3 class="mb-0">{{ target_club.name }}</h3>
+                </div>
+            </div>
+            
+            <!-- Mesaj Alanı -->
+            <div class="card shadow-sm" style="height: calc(100vh - 250px);">
+  <div class="card-body overflow-auto" id="chatBox" style="background-color: #f8f9fa;">
+                    {% if messages %}
+                        {% for msg in messages %}
+                            {% set is_me = msg.sender_id == current_user.id %}
+                            <div class="message-row {{ 'me' if is_me else 'other' }}">
+                                <div class="message-bubble">
+                                    <p class="mb-1" style="white-space: pre-wrap;">{{ msg.content }}</p>
+                                    <small class="text-white-50 d-block text-end" style="font-size: 0.75rem;">
+                                        {{ msg.created_at.strftime('%H:%M') }}
+                                    </small>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center text-muted my-auto">
+                            <i class="bi bi-chat-dots display-4"></i>
+                            <p class="mt-2">Henüz mesaj yok. İlk mesajı sen gönder!</p>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Mesaj Yazma Alanı -->
+                <div class="card-footer bg-white">
+                    <form method="POST" class="d-flex gap-2">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <textarea name="content" class="form-control" rows="1" placeholder="Mesajınızı yazın..." required style="resize: none;"></textarea>
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="bi bi-send"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Sayfa yüklendiğinde en alta kaydır
+    window.onload = function() {
+        var chatBox = document.getElementById("chatBox");
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+</script>
+{% endblock %}

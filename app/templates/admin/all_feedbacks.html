@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Geri Bildirimler - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-2 sidebar p-3">
+            {% include 'admin/_sidebar.html' %}
+        </div>
+        
+        <!-- Main Content -->
+        <div class="col-md-10 main-content">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="bi bi-chat-dots"></i> Geri Bildirimler</h2>
+                <a href="{{ url_for('admin.send_feedback') }}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Yeni Geri Bildirim
+                </a>
+            </div>
+            
+            {% if feedbacks %}
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Hedef Kulüp</th>
+                                        <th>Başlık</th>
+                                        <th>İçerik</th>
+                                        <th>Tarih</th>
+                                        <th>İşlemler</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for feedback in feedbacks %}
+                                        <tr>
+                                            <td>
+                                                {% if feedback.club %}
+                                                    <span class="badge bg-info text-dark">{{ feedback.club.name }}</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">Silinmiş Kulüp</span>
+                                                {% endif %}
+                                            </td>
+                                            <td><strong>{{ feedback.title }}</strong></td>
+                                            <td>{{ feedback.content|truncate(50) }}</td>
+                                            <td>
+                                                <small>{{ feedback.created_at.strftime('%d.%m.%Y') }}</small>
+                                                <br>
+                                                <small class="text-muted">{{ feedback.created_at.strftime('%H:%M') }}</small>
+                                            </td>
+                                            <td>
+                                                <form method="POST" action="{{ url_for('admin.delete_feedback', id=feedback.id) }}">
+                                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                    <button type="submit" class="btn btn-sm btn-danger" 
+                                                            onclick="return confirm('Bu geri bildirimi silmek istediğinizden emin misiniz?')">
+                                                        <i class="bi bi-trash"></i> Sil
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pagination -->
+                {% if pagination.pages > 1 %}
+                    <nav class="mt-3">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+                                <a class="page-link" href="{{ url_for('admin.all_feedbacks', page=pagination.prev_num) if pagination.has_prev else '#' }}">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                            </li>
+                            
+                            {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                                {% if page_num %}
+                                    <li class="page-item {% if page_num == pagination.page %}active{% endif %}">
+                                        <a class="page-link" href="{{ url_for('admin.all_feedbacks', page=page_num) }}">
+                                            {{ page_num }}
+                                        </a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item disabled">
+                                        <span class="page-link">...</span>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+                                <a class="page-link" href="{{ url_for('admin.all_feedbacks', page=pagination.next_num) if pagination.has_next else '#' }}">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                {% endif %}
+            {% else %}
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> Henüz geri bildirim bulunmamaktadır.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

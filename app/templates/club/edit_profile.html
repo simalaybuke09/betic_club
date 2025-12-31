@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+
+{% block title %}Profili Düzenle - {{ club.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-2 sidebar p-3">
+            {% include 'club/_sidebar.html' %}
+        </div>
+        
+        <!-- Main Content -->
+        <div class="col-md-10 main-content">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>
+                    <i class="bi bi-pencil"></i> Profili Düzenle
+                </h2>
+                <a href="{{ url_for('club.dashboard') }}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Geri
+                </a>
+            </div>
+            
+            <form method="POST" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
+                
+                <div class="row">
+                    <!-- Sol Kolon -->
+                    <div class="col-md-8">
+                        <!-- Genel Bilgiler -->
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <i class="bi bi-info-circle"></i> Genel Bilgiler
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-8 mb-3">
+                                        {{ form.name.label(class="form-label") }}
+                                        {{ form.name(class="form-control" + (" is-invalid" if form.name.errors else "")) }}
+                                        {% if form.name.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.name.errors %}
+                                                    {{ error }}
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-md-4 mb-3">
+                                        {{ form.member_count.label(class="form-label") }}
+                                        {{ form.member_count(class="form-control", placeholder="150") }}
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    {{ form.location.label(class="form-label") }}
+                                    {{ form.location(class="form-control" + (" is-invalid" if form.location.errors else ""), placeholder="Mühendislik Fakültesi A Blok") }}
+                                    {% if form.location.errors %}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.location.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    {{ form.about.label(class="form-label") }}
+                                    {{ form.about(class="form-control" + (" is-invalid" if form.about.errors else ""), rows="5", placeholder="Kulübünüz hakkında detaylı bilgi...") }}
+                                    {% if form.about.errors %}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.about.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    {{ form.achievements.label(class="form-label") }}
+                                    {{ form.achievements(class="form-control", rows="4", placeholder="Kulübünüzün başarıları...") }}
+                                    <small class="text-muted">Kazandığınız ödüller, başarılar vb.</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- İletişim Bilgileri -->
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <i class="bi bi-telephone"></i> İletişim Bilgileri
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        {{ form.phone.label(class="form-label") }}
+                                        {{ form.phone(class="form-control", placeholder="0555 123 45 67") }}
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        {{ form.email_contact.label(class="form-label") }}
+                                        {{ form.email_contact(class="form-control", placeholder="kulup@uni.edu.tr") }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Sosyal Medya -->
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <i class="bi bi-share"></i> Sosyal Medya
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">
+                                            <i class="bi bi-instagram text-danger"></i> Instagram
+                                        </label>
+                                        {{ form.instagram(class="form-control", placeholder="kullanici_adi") }}
+                                        <small class="text-muted">Sadece kullanıcı adı (@ olmadan)</small>
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">
+                                            <i class="bi bi-twitter text-info"></i> Twitter
+                                        </label>
+                                        {{ form.twitter(class="form-control", placeholder="kullanici_adi") }}
+                                        <small class="text-muted">Sadece kullanıcı adı (@ olmadan)</small>
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">
+                                            <i class="bi bi-linkedin text-primary"></i> LinkedIn
+                                        </label>
+                                        {{ form.linkedin(class="form-control", placeholder="company/kulup-adi") }}
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">
+                                            <i class="bi bi-facebook text-primary"></i> Facebook
+                                        </label>
+                                        {{ form.facebook(class="form-control", placeholder="kulup.adi") }}
+                                    </div>
+                                    
+                                    <div class="col-12 mb-3">
+                                        <label class="form-label">
+                                            <i class="bi bi-globe"></i> Website
+                                        </label>
+                                        {{ form.website(class="form-control", placeholder="https://kulup.com") }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Kaydet Butonu -->
+                        <div class="d-grid gap-2 mb-3">
+                            {{ form.submit(class="btn btn-primary btn-lg") }}
+                        </div>
+                    </div>
+                    
+                    <!-- Sağ Kolon -->
+                    <div class="col-md-4">
+                        <!-- Logo -->
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <i class="bi bi-image"></i> Logo
+                            </div>
+                            <div class="card-body">
+                                {% if club.logo %}
+                                    <div class="text-center mb-3">
+                                        <img src="{{ url_for('static', filename='uploads/' + club.logo) }}" 
+                                             class="img-fluid rounded" 
+                                             alt="{{ club.name }}"
+                                             style="max-height: 200px;">
+                                        <p class="text-muted small mt-2">Mevcut Logo</p>
+                                    </div>
+                                {% endif %}
+                                
+                                {{ form.logo.label(class="form-label") }}
+                                {{ form.logo(class="form-control") }}
+                                {% if form.logo.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.logo.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <small class="text-muted">
+                                    Maksimum: 16MB (jpg, png, gif, webp)
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <!-- Bilgi -->
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="bi bi-info-circle"></i> Bilgi
+                            </div>
+                            <div class="card-body">
+                                <p class="small">
+                                    <i class="bi bi-lightbulb text-warning"></i> <strong>İpucu:</strong>
+                                    Profilinizi ne kadar detaylı doldurursanız, kullanıcılar sizi o kadar kolay bulur.
+                                </p>
+                                <hr>
+                                <p class="small mb-0">
+                                    <i class="bi bi-check-circle text-success"></i> Profiliniz herkese açıktır.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

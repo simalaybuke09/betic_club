@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+
+{% block title %}Onay Bekleyen Kulüpler - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-2 sidebar p-3">
+            {% include 'admin/_sidebar.html' %}
+        </div>
+        
+        <!-- Main Content -->
+        <div class="col-md-10 main-content">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>
+                    <i class="bi bi-clock-history"></i> Onay Bekleyen Kulüpler
+                </h2>
+            </div>
+            
+            {% if clubs %}
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Logo</th>
+                                        <th>Kulüp Adı</th>
+                                        <th>Kullanıcı Adı</th>
+                                        <th>E-posta</th>
+                                        <th>Konum</th>
+                                        <th>Başvuru Tarihi</th>
+                                        <th>İşlemler</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for account in clubs %}
+                                        <tr>
+                                            <td>
+                                                {% if account.club.logo %}
+                                                    <img src="{{ url_for('static', filename='uploads/' + account.club.logo) }}" 
+                                                         class="club-logo" alt="{{ account.club.name }}">
+                                                {% else %}
+                                                    <div class="club-logo bg-secondary d-flex align-items-center justify-content-center">
+                                                        <i class="bi bi-people text-white"></i>
+                                                    </div>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <strong>{{ account.club.name }}</strong>
+                                                {% if account.club.about %}
+                                                    <br>
+                                                    <small class="text-muted">
+                                                        {{ account.club.about[:50] }}...
+                                                    </small>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ account.username }}</td>
+                                            <td>{{ account.email }}</td>
+                                            <td>{{ account.club.location or '-' }}</td>
+                                            <td>
+                                                <small>{{ account.created_at.strftime('%d.%m.%Y') }}</small>
+                                                <br>
+                                                <small class="text-muted">{{ account.created_at.strftime('%H:%M') }}</small>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <form method="POST" action="{{ url_for('admin.approve_club', id=account.id) }}" 
+                                                          style="display: inline;">
+                                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                        <button type="submit" class="btn btn-sm btn-success" 
+                                                                onclick="return confirm('Bu kulübü onaylamak istediğinizden emin misiniz?')">
+                                                            <i class="bi bi-check-circle"></i> Onayla
+                                                        </button>
+                                                    </form>
+                                                    
+                                                    <button type="button" class="btn btn-sm btn-info" 
+                                                            data-bs-toggle="modal" 
+                                                            data-bs-target="#detailModal{{ account.id }}">
+                                                        <i class="bi bi-eye"></i> Detay
+                                                    </button>
+                                                    
+                                                    <form method="POST" action="{{ url_for('admin.delete_club', id=account.id) }}" 
+                                                          style="display: inline;">
+                                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                        <button type="submit" class="btn btn-sm btn-danger" 
+                                                                onclick="return confirm('Bu kulübü silmek istediğinizden emin misiniz?')">
+                                                            <i class="bi bi-trash"></i> Sil
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        
+                                        <!-- Detay Modal -->
+                                        <div class="modal fade" id="detailModal{{ account.id }}" tabindex="-1">
+                                            <div class="modal-dialog modal-lg">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">{{ account.club.name }} - Detaylar</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <h6>Kulüp Bilgileri</h6>
+                                                                <p><strong>Adı:</strong> {{ account.club.name }}</p>
+                                                                <p><strong>Kullanıcı Adı:</strong> {{ account.username }}</p>
+                                                                <p><strong>E-posta:</strong> {{ account.email }}</p>
+                                                                <p><strong>Konum:</strong> {{ account.club.location }}</p>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                {% if account.club.logo %}
+                                                                    <img src="{{ url_for('static', filename='uploads/' + account.club.logo) }}" 
+                                                                         class="img-fluid rounded" alt="{{ account.club.name }}">
+                                                                {% endif %}
+                                                            </div>
+                                                        </div>
+                                                        <hr>
+                                                        <h6>Hakkında</h6>
+                                                        <p>{{ account.club.about or 'Bilgi girilmemiş.' }}</p>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <form method="POST" action="{{ url_for('admin.approve_club', id=account.id) }}">
+                                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                            <button type="submit" class="btn btn-success">
+                                                                <i class="bi bi-check-circle"></i> Onayla
+                                                            </button>
+                                                        </form>
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pagination -->
+                {% if pagination.pages > 1 %}
+                    <nav>
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+                                <a class="page-link" href="{{ url_for('admin.pending_clubs', page=pagination.prev_num) if pagination.has_prev else '#' }}">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                            </li>
+                            
+                            {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                                {% if page_num %}
+                                    <li class="page-item {% if page_num == pagination.page %}active{% endif %}">
+                                        <a class="page-link" href="{{ url_for('admin.pending_clubs', page=page_num) }}">
+                                            {{ page_num }}
+                                        </a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item disabled">
+                                        <span class="page-link">...</span>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+                                <a class="page-link" href="{{ url_for('admin.pending_clubs', page=pagination.next_num) if pagination.has_next else '#' }}">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                {% endif %}
+            {% else %}
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> Onay bekleyen kulüp bulunmamaktadır.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

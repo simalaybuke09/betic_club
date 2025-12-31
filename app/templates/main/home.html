@@ -1,0 +1,513 @@
+{% extends "base.html" %}
+
+{% block title %}Ana Sayfa - Kulüp Platform{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero-section {
+        /* Arka plan resmi ve üzerine yarı saydam gradient kaplama */
+        background: linear-gradient(135deg, rgba(148, 144, 209, 0.85) 0%, rgba(180, 165, 206, 0.85) 100%), url('https://cdn-yb.ams3.cdn.digitaloceanspaces.com/uploads/universities/56/sSHp3xbm3iRxLhTo5cc01a0a9cabb.jpeg');
+        background-size: cover;
+        background-position: center;
+        color: rgb(28, 13, 95);
+        padding: 100px 0;
+        margin-bottom: 40px;
+        border-radius: 0 0 30px 30px;
+        position: relative;
+    }
+    
+    .search-box {
+        background: rgb(229, 230, 232);
+        border-radius: 50px;
+        padding: 5px;
+        box-shadow: 0 4px 6px rgba(0,0,0,.1);
+        transition: all 0.3s ease;
+    }
+
+    [data-theme="dark"] .search-box {
+        background: rgba(51, 23, 87, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .search-box input {
+        border: none;
+        padding: 12px 20px;
+        border-radius: 50px;
+        background: transparent;
+    }
+
+    [data-theme="dark"] .search-box input {
+        color: rgb(240, 240, 243);
+    }
+
+    [data-theme="dark"] .search-box input::placeholder {
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    [data-theme="dark"] .search-box .input-group-text {
+        background: transparent;
+        border: none;
+        color: white;
+    }
+    
+    .search-box .input-group-text {
+        background: transparent;
+        color: #e0e1e3;
+        font-size: 0.9rem;
+    }
+    
+    .search-box input:focus {
+        outline: none;
+        box-shadow: none;
+    }
+    
+    .search-results {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,.15);
+        margin-top: 10px;
+        max-height: 400px;
+        overflow-y: auto;
+        z-index: 1000;
+        display: none;
+    }
+
+    [data-theme="dark"] .search-results {
+        background: #1e293b;
+        border: 1px solid #334155;
+        box-shadow: 0 4px 12px rgba(0,0,0,.5);
+    }
+    
+    .search-result-item {
+        padding: 15px;
+        border-bottom: 1px solid #f0f0f0;
+        cursor: pointer;
+        transition: background 0.2s;
+        color: #212529;
+    }
+
+    [data-theme="dark"] .search-result-item {
+        border-bottom-color: #334155;
+        color: #f1f5f9;
+    }
+    
+    .search-result-item:hover {
+        background: #f8f9fa;
+    }
+
+    [data-theme="dark"] .search-result-item:hover {
+        background: #334155;
+    }
+    
+    .post-card {
+        border: none;
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+        margin-bottom: 30px;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .post-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .post-author {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    
+    .post-author-logo {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 12px;
+        border: 2px solid #f0f0f0;
+    }
+    
+    .post-image {
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+        border-radius: 12px;
+        margin-bottom: 15px;
+    }
+    
+    .sidebar-widget {
+        background: white;
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: var(--shadow);
+        transition: all 0.3s ease;
+        border: none;
+    }
+
+    [data-theme="dark"] .sidebar-widget {
+        background: #1e293b;
+        border: 1px solid #334155;
+        box-shadow: 0 2px 8px rgba(0,0,0,.3);
+    }
+
+    [data-theme="dark"] .sidebar-widget h5,
+    [data-theme="dark"] .sidebar-widget h6 {
+        color: #f1f5f9;
+    }
+    
+    .quick-link {
+        display: block;
+        padding: 12px 15px;
+        margin-bottom: 8px;
+        border-radius: 8px;
+        text-decoration: none;
+        color: #333;
+        transition: all 0.2s;
+    }
+
+    [data-theme="dark"] .quick-link {
+        color: #f1f5f9;
+    }
+    
+    .quick-link:hover {
+        background: #f0f0f0;
+        color: #4f46e5;
+        transform: translateX(5px);
+    }
+
+    [data-theme="dark"] .quick-link:hover {
+        background: #334155;
+        color: #818cf8;
+    }
+
+    [data-theme="dark"] .sidebar-widget hr {
+        border-color: #334155;
+        opacity: 0.5;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+        color: #ccc;
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 text-center">
+                <h1 class="display-4 mb-3">
+                    <i class="bi bi-mortarboard-fill"></i> Kulüp Platform
+                </h1>
+                <p class="lead mb-4">
+                    Üniversite kulüplerinin buluşma noktası
+                </p>
+                
+                <!-- Arama Kutusu -->
+                <div class="search-box position-relative">
+                    <div class="input-group">
+                        <span class="input-group-text border-0 ps-3">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" 
+                               class="form-control border-0" 
+                               id="clubSearch" 
+                               placeholder="Kulüp ara...">
+                    </div>
+                    <div class="search-results" id="searchResults"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div class="row">
+        <!-- Sol Sidebar -->
+        <div class="col-lg-3 d-none d-lg-block">
+            <div class="sidebar-widget">
+                <h5 class="mb-3">
+                    <i class="bi bi-list-ul"></i> Menü
+                </h5>
+                {% if current_user.is_authenticated %}
+                    {% if current_user.is_admin() %}
+                        <a href="{{ url_for('admin.dashboard') }}" class="quick-link">
+                            <i class="bi bi-speedometer2"></i> Admin Panel
+                        </a>
+                    {% elif current_user.is_club() %}
+                        <a href="{{ url_for('club.dashboard') }}" class="quick-link">
+                            <i class="bi bi-speedometer2"></i> Kulüp Panel
+                        </a>
+                    {% endif %}
+                {% else %}
+                    <a href="{{ url_for('auth.login') }}" class="quick-link">
+                        <i class="bi bi-box-arrow-in-right"></i>Giriş
+                    </a>
+                    <a href="{{ url_for('auth.register') }}" class="quick-link">
+                        <i class="bi bi-person-plus"></i> Kulüp Kaydı
+                    </a>
+                {% endif %}
+                
+                <hr>
+                
+                <a href="{{ url_for('main.clubs') }}" class="quick-link">
+                    <i class="bi bi-people"></i> Tüm Kulüpler
+                </a>
+                <a href="{{ url_for('main.home') }}" class="quick-link">
+                    <i class="bi bi-card-text"></i> Paylaşımlar
+                </a>
+            </div>
+            
+            <div class="sidebar-widget">
+                <h6 class="mb-3">
+                    <i class="bi bi-info-circle"></i> Hakkında
+                </h6>
+                <p class="small text-muted">
+                    Üniversite kulüplerinin duyurularını paylaştığı ve kendilerini tanıttığı platform.
+                </p>
+            </div>
+        </div>
+        
+        <!-- Ana İçerik -->
+        <div class="col-lg-9">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3>
+                    <i class="bi bi-rss"></i> Paylaşımlar
+                </h3>
+                <a href="{{ url_for('main.clubs') }}" class="btn btn-outline-primary">
+                    <i class="bi bi-people"></i> Tüm Kulüpler
+                </a>
+            </div>
+            
+            {% if posts %}
+                <!-- Paylaşım Kartları -->
+                {% for post in posts %}
+                    <div class="card post-card">
+                        <div class="card-body">
+                            <!-- Yazar Bilgisi -->
+                            <div class="post-author">
+                                {% if post.get_author_logo() %}
+                                    <img src="{{ url_for('static', filename='uploads/' + post.get_author_logo()) }}" 
+                                         class="post-author-logo" 
+                                         alt="{{ post.get_author_name() }}">
+                                {% else %}
+                                    <div class="post-author-logo bg-secondary d-flex align-items-center justify-content-center">
+                                        <i class="bi bi-{% if post.is_by_admin() %}shield-check{% else %}people{% endif %} text-white"></i>
+                                    </div>
+                                {% endif %}
+                                
+                                <div>
+                                    {% if post.get_club() %}
+                                        <a href="{{ url_for('main.club_profile', slug=post.get_club().slug) }}" 
+                                           class="text-decoration-none">
+                                            <h6 class="mb-0">{{ post.get_author_name() }}</h6>
+                                        </a>
+                                    {% else %}
+                                        <h6 class="mb-0">
+                                            <span class="badge bg-danger">
+                                                <i class="bi bi-shield-check"></i> {{ post.get_author_name() }}
+                                            </span>
+                                        </h6>
+                                    {% endif %}
+                                    <small class="text-muted">
+                                        <i class="bi bi-clock"></i> {{ post.created_at.strftime('%d.%m.%Y %H:%M') }}
+                                    </small>
+                                </div>
+                            </div>
+                            
+                            <!-- Başlık -->
+                            <h4 class="card-title mb-3">{{ post.title }}</h4>
+                            
+                            <!-- Görseller -->
+                            {% if post.get_images() %}
+                                <div class="post-images-gallery mb-3">
+                                    <div class="d-flex overflow-auto" style="gap: 10px; scroll-snap-type: x mandatory;">
+                                        {% for img in post.get_images() %}
+                                            <img src="{{ url_for('static', filename='uploads/' + img) }}" 
+                                                 class="post-image-gallery" 
+                                                 alt="{{ post.title }}"
+                                                 style="min-width: 300px; height: 300px; object-fit: cover; scroll-snap-align: start;">
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                            
+                            <!-- İçerik -->
+                            <p class="card-text" style="white-space: pre-wrap;">{{ post.content }}</p>
+                            
+                            <!-- Sosyal Medya Paylaşım -->
+                            <div class="share-buttons mt-3 pt-3 border-top">
+                                {% if post.get_club() %}
+                                    {% set post_url = url_for('main.club_profile', slug=post.get_club().slug, _external=True) + '#post-' + post.id|string %}
+                                {% else %}
+                                    {% set post_url = url_for('main.home', _external=True) + '#post-' + post.id|string %}
+                                {% endif %}
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="https://twitter.com/intent/tweet?text={{ post.title|urlencode }}&url={{ post_url|urlencode }}" 
+                                       target="_blank" 
+                                       class="btn btn-info">
+                                        <i class="bi bi-twitter"></i> Twitter
+                                    </a>
+                                    <a href="https://www.facebook.com/sharer/sharer.php?u={{ post_url|urlencode }}" 
+                                       target="_blank" 
+                                       class="btn btn-primary">
+                                        <i class="bi bi-facebook"></i> Facebook
+                                    </a>
+                                    <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ post_url|urlencode }}" 
+                                       target="_blank" 
+                                       class="btn btn-secondary">
+                                        <i class="bi bi-linkedin"></i> LinkedIn
+                                    </a>
+                                    <button onclick="copyToClipboard('{{ post_url }}', this)" 
+                                            class="btn btn-secondary">
+                                        <i class="bi bi-link-45deg"></i> Link Kopyala
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Alt Bilgiler -->
+                            <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                                <div>
+                                    {% if post.get_club() %}
+                                        <a href="{{ url_for('main.club_profile', slug=post.get_club().slug) }}" 
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-eye"></i> Kulübü Görüntüle
+                                        </a>
+                                    {% endif %}
+                                </div>
+                                <small class="text-muted">
+                                    {% if post.updated_at != post.created_at %}
+                                        <i class="bi bi-pencil"></i> Düzenlendi
+                                    {% endif %}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+                
+                <!-- Pagination -->
+                {% if pagination.pages > 1 %}
+                    <nav>
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+                                <a class="page-link" href="{{ url_for('main.home', page=pagination.prev_num) if pagination.has_prev else '#' }}">
+                                    <i class="bi bi-chevron-left"></i> Önceki
+                                </a>
+                            </li>
+                            
+                            {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                                {% if page_num %}
+                                    <li class="page-item {% if page_num == pagination.page %}active{% endif %}">
+                                        <a class="page-link" href="{{ url_for('main.home', page=page_num) }}">
+                                            {{ page_num }}
+                                        </a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item disabled">
+                                        <span class="page-link">...</span>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+                                <a class="page-link" href="{{ url_for('main.home', page=pagination.next_num) if pagination.has_next else '#' }}">
+                                    Sonraki <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                {% endif %}
+            {% else %}
+                <!-- Boş Durum -->
+                <div class="empty-state">
+                    <i class="bi bi-inbox"></i>
+                    <h4>Henüz Paylaşım Yok</h4>
+                    <p class="text-muted">
+                        Kulüpler paylaşım yaptıkça burada görünecekler.
+                    </p>
+                    <a href="{{ url_for('main.clubs') }}" class="btn btn-primary mt-3">
+                        <i class="bi bi-people"></i> Kulüpleri Keşfet
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Kulüp arama
+    const searchInput = document.getElementById('clubSearch');
+    const searchResults = document.getElementById('searchResults');
+    let searchTimeout;
+    
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        const query = this.value.trim();
+        
+        if (query.length < 2) {
+            searchResults.style.display = 'none';
+            return;
+        }
+        
+        searchTimeout = setTimeout(() => {
+            fetch(`/search?q=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.length > 0) {
+                        let html = '';
+                        data.forEach(club => {
+                            html += `
+                                <div class="search-result-item" onclick="window.location.href='/club/${club.slug}'">
+                                    <div class="d-flex align-items-center">
+                                        ${club.logo ? 
+                                            `<img src="/static/uploads/${club.logo}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; margin-right: 12px;">` :
+                                            `<div style="width: 40px; height: 40px; border-radius: 50%; background: #ccc; margin-right: 12px; display: flex; align-items: center; justify-content: center;">
+                                                <i class="bi bi-people text-white"></i>
+                                            </div>`
+                                        }
+                                        <div>
+                                            <strong>${club.name}</strong>
+                                            <br>
+                                            <small class="text-muted">
+                                                <i class="bi bi-geo-alt"></i> ${club.location || 'Konum belirtilmemiş'}
+                                                ${club.member_count ? ` • <i class="bi bi-people"></i> ${club.member_count} üye` : ''}
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        searchResults.innerHTML = html;
+                        searchResults.style.display = 'block';
+                    } else {
+                        searchResults.innerHTML = '<div class="search-result-item text-muted">Sonuç bulunamadı</div>';
+                        searchResults.style.display = 'block';
+                    }
+                });
+        }, 300);
+    });
+    
+    // Dışarı tıklayınca kapat
+    document.addEventListener('click', function(e) {
+        if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+            searchResults.style.display = 'none';
+        }
+    });
+</script>
+{% endblock %}

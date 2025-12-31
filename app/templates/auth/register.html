@@ -1,0 +1,241 @@
+{% extends "base.html" %}
+
+{% block title %}Kulüp Kaydı{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center mt-5 mb-5">
+        <div class="col-md-10 col-lg-8">
+            <div class="card shadow-lg">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <i class="bi bi-person-plus" style="font-size: 3rem; color: #3498db;"></i>
+                        <h3 class="mt-3">Kulüp Kaydı</h3>
+                        <p class="text-muted">Kulübünüzü platforma kaydedin</p>
+                    </div>
+                    
+                    <form method="POST" enctype="multipart/form-data">
+                        {{ form.hidden_tag() }}
+                        
+                        <!-- Kulüp Adı -->
+                        <div class="mb-3">
+                            {{ form.username.label(class="form-label") }}
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-people"></i>
+                                </span>
+                                {{ form.username(class="form-control" + (" is-invalid" if form.username.errors else ""), placeholder="Yazılım Kulübü") }}
+                                {% if form.username.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.username.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <small class="text-muted">Giriş için kullanılacak (benzersiz olmalı)</small>
+                        </div>
+                        
+                        <!-- E-posta -->
+                        <div class="mb-3">
+                            {{ form.email.label(class="form-label") }}
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-envelope"></i>
+                                </span>
+                                {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""), placeholder="kulup@uni.edu.tr") }}
+                                {% if form.email.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.email.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Hakkında -->
+                        <div class="mb-3">
+                            {{ form.about.label(class="form-label") }}
+                            {{ form.about(class="form-control" + (" is-invalid" if form.about.errors else ""), rows="4", placeholder="Kulübünüz hakkında detaylı bilgi verin...") }}
+                            {% if form.about.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.about.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <small class="text-muted">En az 20 karakter - Kulübünüzün amacını, faaliyetlerini anlatın</small>
+                        </div>
+                        <!-- Başarılarımız (YENİ) -->
+                        <div class="mb-3">
+                            {{ form.achievements.label(class="form-label") }}
+                            {{ form.achievements(class="form-control", rows="3") }}
+                            <small class="text-muted">Kulübünüzün kazandığı ödüller, başarılar vb.</small>
+                        </div>
+                        <!-- Kulüp Yeri -->
+                        <div class="mb-3">
+                            {{ form.location.label(class="form-label") }}
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-geo-alt"></i>
+                                </span>
+                                {{ form.location(class="form-control" + (" is-invalid" if form.location.errors else ""), placeholder="Mühendislik Fakültesi A Blok") }}
+                                {% if form.location.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.location.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Üye Sayısı (YENİ) -->
+                        <div class="mb-3">
+                            {{ form.member_count.label(class="form-label") }}
+                            {{ form.member_count(class="form-control", placeholder="150") }}
+                        </div>
+
+                        <!-- Telefon (YENİ) -->
+                        <div class="mb-3">
+                            {{ form.phone.label(class="form-label") }}
+                            {{ form.phone(class="form-control", placeholder="0555 123 45 67") }}
+                        </div>
+
+                        <!-- Instagram (YENİ) -->
+                        <div class="mb-3">
+                            {{ form.instagram.label(class="form-label") }}
+                            {{ form.instagram(class="form-control", placeholder="kulup_adi") }}
+                            <small class="text-muted">@ olmadan sadece kullanıcı adı</small>
+                        </div>
+
+                        <!-- Twitter (YENİ) -->
+                        <div class="mb-3">
+                            {{ form.twitter.label(class="form-label") }}
+                            {{ form.twitter(class="form-control", placeholder="kulup_adi") }}
+                        </div>
+                                                
+                        <!-- Logo -->
+                        <div class="mb-3">
+                            {{ form.logo.label(class="form-label") }}
+                            {{ form.logo(class="form-control" + (" is-invalid" if form.logo.errors else "")) }}
+                            {% if form.logo.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.logo.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <small class="text-muted">Maksimum: 16MB (jpg, png, gif, webp) - Opsiyonel</small>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <!-- Şifre -->
+                                <div class="mb-3">
+                                    {{ form.password.label(class="form-label") }}
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i class="bi bi-lock"></i>
+                                        </span>
+                                        {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""), placeholder="En az 6 karakter") }}
+                                        {% if form.password.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.password.errors %}
+                                                    {{ error }}
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <!-- Şifre Tekrar -->
+                                <div class="mb-3">
+                                    {{ form.confirm_password.label(class="form-label") }}
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i class="bi bi-lock-fill"></i>
+                                        </span>
+                                        {{ form.confirm_password(class="form-control" + (" is-invalid" if form.confirm_password.errors else ""), placeholder="Şifreyi tekrar girin") }}
+                                        {% if form.confirm_password.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.confirm_password.errors %}
+                                                    {{ error }}
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Kayıt Butonu -->
+                        <div class="d-grid mb-3">
+                            {{ form.submit(class="btn btn-primary btn-lg") }}
+                        </div>
+                    </form>
+                    
+                    <hr>
+                    
+                    <!-- Giriş Linki -->
+                    <div class="text-center">
+                        <p class="mb-0">
+                            Zaten hesabınız var mı? 
+                            <a href="{{ url_for('auth.login') }}" class="text-decoration-none">
+                                <strong>Giriş Yap</strong>
+                            </a>
+                        </p>
+                    </div>
+                    
+                    <!-- Ana Sayfa Linki -->
+                    <div class="text-center mt-3">
+                        <a href="{{ url_for('main.home') }}" class="btn btn-outline-secondary btn-sm">
+                            <i class="bi bi-house"></i> Ana Sayfaya Dön
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Bilgi Kartı -->
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h6 class="card-title">
+                        <i class="bi bi-info-circle"></i> Önemli Bilgiler
+                    </h6>
+                    <ul class="small mb-0">
+                        <li>Kayıt olduktan sonra hesabınız <strong>yönetici onayı</strong> bekleyecektir.</li>
+                        <li>Onaylandıktan sonra paylaşım yapabilir ve profilinizi düzenleyebilirsiniz.</li>
+                        <li>Kulüp adı ve e-posta benzersiz olmalıdır.</li>
+                        <li>Logo yüklemek opsiyoneldir, daha sonra da ekleyebilirsiniz.</li>
+                        <li>Kayıt sırasında verdiğiniz bilgileri daha sonra düzenleyebilirsiniz.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border: none;
+        border-radius: 15px;
+    }
+    
+    .input-group-text {
+        background-color: #f8f9fa;
+        border-right: none;
+    }
+    
+    .form-control {
+        border-left: none;
+    }
+    
+    .form-control:focus {
+        box-shadow: none;
+        border-color: #ced4da;
+    }
+</style>
+{% endblock %}
